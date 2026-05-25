@@ -426,22 +426,134 @@
 
         function exportarPDF() { window.print(); }
 
-        function generadorSemilla() {
-            // Inicializado con los datos oficiales de tu tabla dinámica (Corte 16 al 22 de mayo)
-            return [
-                { fecha: "2026-05-16", valorLab: "1", niño: 1, adolescente: 0, joven: 4, adulto: 34, adultoMayor: 10 },
-                { fecha: "2026-05-18", valorLab: "1", niño: 5, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
-                { fecha: "2026-05-19", valorLab: "1", niño: 1, adolescente: 66, joven: 1, adulto: 1, adultoMayor: 0 },
-                { fecha: "2026-05-20", valorLab: "1", niño: 2, adolescente: 0, joven: 6, adulto: 24, adultoMayor: 4 },
-                { fecha: "2026-05-21", valorLab: "1", niño: 0, adolescente: 1, joven: 1, adulto: 1, adultoMayor: 0 },
-                { fecha: "2026-05-22", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
-                
-                { fecha: "2026-05-16", valorLab: "TA", niño: 1, adolescente: 0, joven: 1, adulto: 31, adultoMayor: 0 },
-                { fecha: "2026-05-18", valorLab: "TA", niño: 3, adolescente: 1, joven: 72, adulto: 59, adultoMayor: 8 },
-                { fecha: "2026-05-19", valorLab: "TA", niño: 0, adolescente: 82, joven: 0, adulto: 0, adultoMayor: 0 },
-                { fecha: "2026-05-21", valorLab: "TA", niño: 0, adolescente: 56, joven: 0, adulto: 0, adultoMayor: 2 }
-            ];
-        }
+       function generadorSemilla() {
+    // Inicializado con los datos reales y completos fila por fila (Del 02 al 23 de mayo de 2026)
+    return [
+        // --- FECHA: 2026-05-02 ---
+        { fecha: "2026-05-02", valorLab: "1", niño: 4, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-02", valorLab: "1", niño: 0, adolescente: 0, joven: 1, adulto: 5, adultoMayor: 0 },
+        { fecha: "2026-05-02", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-02", valorLab: "1", niño: 4, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-02", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-02", valorLab: "1", niño: 0, adolescente: 0, joven: 1, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-02", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-04 ---
+        { fecha: "2026-05-04", valorLab: "1", niño: 6, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-04", valorLab: "TA", niño: 0, adolescente: 0, joven: 1, adulto: 2, adultoMayor: 0 },
+        { fecha: "2026-05-04", valorLab: "1", niño: 0, adolescente: 0, joven: 2, adulto: 7, adultoMayor: 1 },
+        { fecha: "2026-05-04", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-04", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-05 ---
+        { fecha: "2026-05-05", valorLab: "1", niño: 3, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-05", valorLab: "1", niño: 1, adolescente: 1, joven: 0, adulto: 0, adultoMayor: 2 },
+        { fecha: "2026-05-05", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-06 ---
+        { fecha: "2026-05-06", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 2, adultoMayor: 0 },
+        { fecha: "2026-05-06", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-06", valorLab: "1", niño: 4, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-06", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-06", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-07 ---
+        { fecha: "2026-05-07", valorLab: "TA", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-07", valorLab: "1", niño: 0, adolescente: 5, joven: 0, adulto: 0, adultoMayor: 1 },
+        { fecha: "2026-05-07", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-08 ---
+        { fecha: "2026-05-08", valorLab: "1", niño: 0, adolescente: 0, joven: 2, adulto: 3, adultoMayor: 0 },
+        { fecha: "2026-05-08", valorLab: "1", niño: 0, adolescente: 1, joven: 2, adulto: 4, adultoMayor: 4 },
+        { fecha: "2026-05-08", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-08", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 1 },
+
+        // --- FECHA: 2026-05-09 ---
+        { fecha: "2026-05-09", valorLab: "1", niño: 3, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-09", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 2, adultoMayor: 0 },
+        { fecha: "2026-05-09", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-11 ---
+        { fecha: "2026-05-11", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 3, adultoMayor: 0 },
+        { fecha: "2026-05-11", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-11", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-11", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-12 ---
+        { fecha: "2026-05-12", valorLab: "TA", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-12", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 4, adultoMayor: 0 },
+        { fecha: "2026-05-12", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-12", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 2, adultoMayor: 0 },
+        { fecha: "2026-05-12", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-12", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-13 ---
+        { fecha: "2026-05-13", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 2, adultoMayor: 0 },
+        { fecha: "2026-05-13", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-13", valorLab: "TA", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-14 ---
+        { fecha: "2026-05-14", valorLab: "1", niño: 3, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-14", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-14", valorLab: "1", niño: 0, adolescente: 2, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-14", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-15 ---
+        { fecha: "2026-05-15", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-15", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-15", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-16 ---
+        { fecha: "2026-05-16", valorLab: "TA", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-16", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-16", valorLab: "1", niño: 0, adolescente: 0, joven: 4, adulto: 33, Hacker: 0, adultoMayor: 10 },
+        { fecha: "2026-05-16", valorLab: "TA", niño: 0, adolescente: 0, joven: 1, Hacker: 0, adulto: 31, adultoMayor: 0 },
+        { fecha: "2026-05-16", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-18 ---
+        { fecha: "2026-05-18", valorLab: "TA", niño: 3, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-18", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 2, adultoMayor: 0 },
+        { fecha: "2026-05-18", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-18", valorLab: "1", niño: 5, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-18", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 2 },
+        { fecha: "2026-05-18", valorLab: "TA", niño: 0, adolescente: 1, joven: 39, adulto: 15, adultoMayor: 6 },
+        { fecha: "2026-05-18", valorLab: "TA", niño: 0, adolescente: 1, joven: 33, adulto: 42, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-19 ---
+        { fecha: "2026-05-19", valorLab: "1", niño: 0, adolescente: 0, joven: 1, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-19", valorLab: "1", niño: 0, adolescente: 2, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-19", valorLab: "1", niño: 1, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-19", valorLab: "1", niño: 0, adolescente: 1, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-19", valorLab: "TA", niño: 0, adolescente: 82, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-19", valorLab: "1", niño: 0, adolescente: 84, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-19", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-20 ---
+        { fecha: "2026-05-20", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 3, adultoMayor: 0 },
+        { fecha: "2026-05-20", valorLab: "1", niño: 0, adolescente: 0, joven: 6, adulto: 21, adultoMayor: 4 },
+        { fecha: "2026-05-20", valorLab: "1", niño: 27, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-21 ---
+        { fecha: "2026-05-21", valorLab: "1", niño: 0, adolescente: 0, joven: 1, adulto: 1, adultoMayor: 0 },
+        { fecha: "2026-05-21", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 2 },
+        { fecha: "2026-05-21", valorLab: "1", niño: 0, adolescente: 0, joven: 1, adulto: 11, adultoMayor: 5 },
+        { fecha: "2026-05-21", valorLab: "TA", niño: 0, adolescente: 56, joven: 1, adulto: 8, adultoMayor: 2 },
+        { fecha: "2026-05-21", valorLab: "1", niño: 0, adolescente: 53, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-21", valorLab: "1", niño: 0, adolescente: 0, joven: 0, adulto: 1, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-22 ---
+        { fecha: "2026-05-22", valorLab: "1", niño: 4, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-22", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 3 },
+        { fecha: "2026-05-22", valorLab: "1", niño: 0, adolescente: 61, joven: 0, adulto: 0, adultoMayor: 24 },
+        { fecha: "2026-05-22", valorLab: "1", niño: 0, adolescente: 61, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-22", valorLab: "1", niño: 3, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+
+        // --- FECHA: 2026-05-23 ---
+        { fecha: "2026-05-23", valorLab: "1", niño: 5, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 },
+        { fecha: "2026-05-23", valorLab: "TA", niño: 0, adolescente: 0, joven: 0, adulto: 2, adultoMayor: 10 },
+        { fecha: "2026-05-23", valorLab: "1", niño: 2, adolescente: 0, joven: 0, adulto: 0, adultoMayor: 0 }
+    ];
+}
     </script>
 </body>
 </html>
