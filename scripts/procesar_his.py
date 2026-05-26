@@ -2,64 +2,85 @@ import pandas as pd
 import os
 
 def procesar_informacion_his():
-    # Ruta del archivo que exportas con tu consulta SQL y subes a GitHub
     ruta_origen = 'data/his_raw.csv'
-    # El archivo limpio final comprimido que lee tu HTML
     ruta_destino = 'data/data_jornada.csv'
     
     if not os.path.exists(ruta_origen):
-        print("Aviso: No se detectó un archivo nuevo en 'data/his_raw.csv'. Se mantiene la data actual.")
+        print("Aviso: No se detectó un archivo nuevo en 'data/his_raw.csv'.")
         return
 
-    print("Iniciando consolidación de datos exportados por el Script SQL...")
+    print("Iniciando consolidación adaptativa de etapas de vida...")
     
-    # 1. Carga del CSV controlando codificación y separadores comunes en exportaciones de BD
+    # 1. Leer el CSV detectando el separador automáticamente (soportando UTF-8 y Latin-1)
     try:
         df = pd.read_csv(ruta_origen, sep=';', encoding='utf-8')
     except Exception:
-        df = pd.read_csv(ruta_origen, sep=',', encoding='utf-8')
+        try:
+            df = pd.read_csv(ruta_origen, sep=',', encoding='utf-8')
+        except Exception:
+            df = pd.read_csv(ruta_origen, sep=None, engine='python', encoding='latin-1')
     
-    # Limpiar espacios en blanco invisibles en los nombres de las cabeceras
-    df.columns = [col.strip() for col in df.columns]
+    # Limpiar espacios rebeldes en las cabeceras y pasarlo a mayúsculas string limpias
+    df.columns = [str(col).strip().upper() for col in df.columns]
     
-    # 2. Normalizar nombres de columnas críticas por si tu SQL exportó en mayúsculas/minúsculas
-    # Buscamos correspondencias sin importar cómo lo haya estructurado el gestor de BD
-    mapeo_columnas = {
-        'anio': 'Anio', 'MES': 'Mes', 'FECHA_ATENCION': 'Fecha_Atencion', 
-        'UPSS': 'UPSS', 'codigo_item': 'Codigo_Item', 'valor_lab': 'Valor_Lab'
-    }
-    df.rename(columns=mapeo_columnas, inplace=True)
-    
-    # 3. Filtrado de seguridad (por si acaso el filtro del SQL trajo otros datos o nulos)
-    if 'Valor_Lab' in df.columns:
-        df['Valor_Lab'] = df['Valor_Lab'].astype(str).str.strip()
-        df = df[df['Valor_Lab'].isin(['1', 'TA'])]
-    else:
-        print("Error: No se encontró la columna 'valor_lab' en el archivo exportado.")
+    # 2. Identificación dinámica de columnas para evitar fallos por tildes, eñes o espacios
+    col_fecha = None
+    col_lab = None
+    col_niño = None
+    col_adolescente = None
+    col_joven = None
+    col_adulto = None
+    col_mayor = None
+
+    for col in df.columns:
+        if 'FECHA' in col: col_fecha = col
+        elif 'LAB' in col: col_lab = col
+        elif 'NIÑ' in col: col_niño = col
+        elif 'ADOLE' in col: col_adolescente = col
+        elif 'JOV' in col: col_joven = col
+        elif 'MAYOR' in col: col_mayor = col
+        elif 'ADULT' in col and 'MAYOR' not in col: col_adulto = col
+
+    # Validar que al menos las columnas de control existan
+    if not col_fecha or not col_lab:
+        print(f"Error Crítico: No se encontraron las columnas de Fecha o Valor_Lab. Cabeceras reales: {list(df.columns)}")
         return
+
+    # 3. Forzar el renombrado estandarizado para que el HTML reciba exactamente lo que espera
+    mapeo = {col_fecha: 'Fecha_Atencion', col_lab: 'Valor_Lab'}
+    if col_niño: mapeo[col_niño] = 'NIÑO'
+    if col_adolescente: mapeo[col_adolescente] = 'ADOLESCENTE'
+    if col_joven: mapeo[col_joven] = 'JOVEN'
+    if col_adulto: mapeo[col_adulto] = 'ADULTO'
+    if col_mayor: mapeo[col_mayor] = 'ADULTO MAYOR'
+    
+    df.rename(columns=mapeo, inplace=True)
+
+    # 4. Limpieza y filtrado estricto por valores permitidos ('1' o 'TA')
+    df['Valor_Lab'] = df['Valor_Lab'].astype(str).str.strip()
+    df = df[df['Valor_Lab'].isin(['1', 'TA'])]
 
     if df.empty:
-        print("Aviso: El archivo no contiene registros válidos para '1' o 'TA'.")
+        print("Aviso: No se encontraron registros con Valor_Lab = '1' o 'TA'. El archivo quedará intacto.")
         return
 
-    # 4. Asegurar que las columnas de grupos etarios existan y sean numéricas (enteros)
-    grupos_etarios = ['NIÑO', 'ADOLESCENTE', 'JOVEN', 'ADULTO', 'ADULTO MAYOR']
-    for grupo in grupos_etarios:
-        if grupo in df.columns:
-            df[grupo] = pd.to_numeric(df[grupo], errors='coerce').fillna(0).astype(int)
+    # 5. Asegurar y forzar que los grupos etarios sean números enteros perfectos
+    grupos_finales = ['NIÑO', 'ADOLESCENTE', 'JOVEN', 'ADULTO', 'ADULTO MAYOR']
+    for g in grupos_finales:
+        if g in df.columns:
+            df[g] = pd.to_numeric(df[g], errors='coerce').fillna(0).astype(int)
         else:
-            # Si por alguna razón la BD no botó registros para una etapa, la inicializamos en 0
-            df[grupo] = 0
+            df[g] = 0
             
-    # 5. Normalizar el formato de la fecha de atención (eliminar horas si tu BD exportó tipo Timestamp)
+    # Limpiar la fecha de atención retirando horas (se queda en YYYY-MM-DD)
     df['Fecha_Atencion'] = df['Fecha_Atencion'].astype(str).str.split(' ').str[0]
     
-    # 6. Agrupación final masiva (Suma todos los conteos de los profesionales por día y plan)
-    df_final = df.groupby(['Fecha_Atencion', 'Valor_Lab'])[grupos_etarios].sum().reset_index()
+    # 6. Agrupación final masiva para consolidar las filas del personal
+    df_consolidado = df.groupby(['Fecha_Atencion', 'Valor_Lab'])[grupos_finales].sum().reset_index()
     
-    # 7. Guardar la base de datos estática para producción
-    df_final.to_csv(ruta_destino, index=False)
-    print(f"Sincronización exitosa. Se consolidaron {len(df_final)} fechas de atención para el C.S. Medalla Milagrosa.")
+    # 7. Sobrescribir el archivo de producción forzando el formato estándar de comas
+    df_consolidado.to_csv(ruta_destino, sep=',', index=False, encoding='utf-8')
+    print(f"¡Éxito Absoluto! Se reescribió data_jornada.csv con {len(df_consolidado)} filas consolidadas.")
 
 if __name__ == "__main__":
     procesar_informacion_his()
