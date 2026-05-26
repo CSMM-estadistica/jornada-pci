@@ -246,18 +246,24 @@
                 .then(textoCsv => {
                     const workbook = XLSX.read(textoCsv, { type: 'string' });
                     const hoja = workbook.Sheets[workbook.SheetNames[0]];
-                    const filasJson = XLSX.utils.sheet_to_json(hoja, { defval: 0 });
+                    // raw:false para que XLSX formatee fechas como texto, no como número serial
+                    const filasJson = XLSX.utils.sheet_to_json(hoja, { defval: 0, raw: false });
                     
                     if(filasJson.length > 0) {
-                        DB_FILAS = filasJson.map(r => ({
-                            fecha: String(r['Fecha_Atencion'] || '').split(' ')[0],
-                            valorLab: String(r['Valor_Lab'] || '').trim(),
-                            niño: parseInt(r['NIÑO']) || 0,
-                            adolescente: parseInt(r['ADOLESCENTE']) || 0,
-                            joven: parseInt(r['JOVEN']) || 0,
-                            adulto: parseInt(r['ADULTO']) || 0,
-                            adultoMayor: parseInt(r['ADULTO MAYOR']) || 0
-                        }));
+                        DB_FILAS = filasJson.map(r => {
+                            // Normalizar fecha a YYYY-MM-DD sin importar el formato de origen
+                            const rawFecha = String(r['Fecha_Atencion'] || '').split(' ')[0];
+                            const fechaNorm = formatearFechaEstandar(rawFecha);
+                            return {
+                                fecha: fechaNorm,
+                                valorLab: String(r['Valor_Lab'] || '').trim(),
+                                niño: parseInt(r['NIÑO']) || 0,
+                                adolescente: parseInt(r['ADOLESCENTE']) || 0,
+                                joven: parseInt(r['JOVEN']) || 0,
+                                adulto: parseInt(r['ADULTO']) || 0,
+                                adultoMayor: parseInt(r['ADULTO MAYOR']) || 0
+                            };
+                        });
                         extraerLimitesFechas();
                         filtrarYCalcular();
                     }
@@ -331,12 +337,27 @@
         }
 
         function formatearFechaEstandar(strFecha) {
-            if(!strFecha || strFecha === '0') return new Date().toISOString().split('T')[0];
-            if(strFecha.includes('/')) {
-                const partes = strFecha.split('/');
-                if(partes[2]?.length === 4) return `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+            if (!strFecha || strFecha === '0') return '';
+            
+            // Ya está en YYYY-MM-DD
+            if (/^\d{4}-\d{2}-\d{2}$/.test(strFecha)) return strFecha;
+            
+            // Formato DD/MM/YYYY (el más común en Perú)
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(strFecha)) {
+                const [d, m, y] = strFecha.split('/');
+                return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
             }
-            return strFecha.split(' ')[0];
+            
+            // Formato YYYY/MM/DD
+            if (/^\d{4}\/\d{2}\/\d{2}$/.test(strFecha)) {
+                return strFecha.replace(/\//g, '-');
+            }
+            
+            // Intentar parseo nativo como último recurso
+            const d = new Date(strFecha);
+            if (!isNaN(d)) return d.toISOString().split('T')[0];
+            
+            return strFecha;
         }
 
         function extraerLimitesFechas() {
