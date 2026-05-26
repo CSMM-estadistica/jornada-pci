@@ -1,0 +1,36 @@
+name: Pipeline de Actualizacion Diaria de Datos HIS
+
+on:
+  push:
+    paths:
+      - 'his_raw.csv'
+      - 'data/his_raw.csv'
+      - 'scripts/procesar_his.py'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clonar el repositorio
+      uses: actions/checkout@v3
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas
+
+    - name: Ejecutar Script de Procesamiento HIS
+      run: python scripts/procesar_his.py
+
+    - name: Guardar cambios en data_jornada.csv
+      run: |
+        git config --local user.email "actions@github.com"
+        git config --local user.name "GitHub Actions"
+        git add data/data_jornada.csv
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Autodespliegue: data_jornada.csv actualizado con data real del EESS" && git push)
