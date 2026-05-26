@@ -223,14 +223,42 @@
         let chartDonaInstance = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const localRaw = localStorage.getItem('mm_jornadas_raw_db');
-            if (localRaw) {
-                DB_FILAS = JSON.parse(localRaw);
-            } else {
-                DB_FILAS = generadorSemilla();
-            }
-            extraerLimitesFechas();
-            filtrarYCalcular();
+            // Apunta al archivo consolidado relativo dentro del propio servidor de GitHub
+            const URL_DATA_CSV = "data/data_jornada.csv"; 
+        
+            fetch(URL_DATA_CSV)
+                .then(response => {
+                    if (!response.ok) throw new Error("Falta inicializar el archivo de datos consolidados.");
+                    return response.text();
+                })
+                .then(textoCsv => {
+                    // SheetJS lee directamente la cadena CSV optimizada
+                    const workbook = XLSX.read(textoCsv, { type: 'string' });
+                    const hoja = workbook.Sheets[workbook.SheetNames[0]];
+                    const filasJson = XLSX.utils.sheet_to_json(hoja, { defval: 0 });
+                    
+                    if(filasJson.length > 0) {
+                        // Mapeo directo a la memoria del Dashboard
+                        DB_FILAS = filasJson.map(r => ({
+                            fecha: String(r['Fecha_Atencion'] || '').split(' ')[0],
+                            valorLab: String(r['Valor_Lab'] || '').trim(),
+                            niño: parseInt(r['NIÑO']) || 0,
+                            adolescente: parseInt(r['ADOLESCENTE']) || 0,
+                            joven: parseInt(r['JOVEN']) || 0,
+                            adulto: parseInt(r['ADULTO']) || 0,
+                            adultoMayor: parseInt(r['ADULTO MAYOR']) || 0
+                        }));
+                        extraerLimitesFechas();
+                        filtrarYCalcular();
+                        console.log("Base de datos GitOps sincronizada con éxito.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Usando datos de respaldo:", error);
+                    DB_FILAS = generadorSemilla();
+                    extraerLimitesFechas();
+                    filtrarYCalcular();
+                });
         });
 
         function openModal() { document.getElementById('uploadModal').classList.remove('hidden'); }
