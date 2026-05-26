@@ -360,19 +360,27 @@
             return strFecha;
         }
 
-        function extraerLimitesFechas() {
-            if (DB_FILAS.length === 0) return;
+          function extraerLimitesFechas() {
+            if (!DB_FILAS || DB_FILAS.length === 0) return;
             
-            // Filtrar fechas vacías o inválidas antes de ordenar
-            const fechas = DB_FILAS
+            // 1. Extraer y limpiar solo las fechas que cumplan con la estructura YYYY-MM-DD
+            const fechasValidas = DB_FILAS
                 .map(f => f.fecha)
-                .filter(f => f && /^\d{4}-\d{2}-\d{2}$/.test(f))
-                .sort();
+                .filter(f => f && /^\d{4}-\d{2}-\d{2}$/.test(f));
             
-            if (fechas.length === 0) return;
+            if (fechasValidas.length === 0) return;
             
-            document.getElementById('filter-fecha-inicio').value = fechas[0];
-            document.getElementById('filter-fecha-fin').value = fechas[fechas.length - 1];
+            // 2. Ordenar cronológicamente de forma explícita (De menor a mayor)
+            fechasValidas.sort((a, b) => Date.parse(a) - Date.parse(b));
+            
+            // 3. Asignar los extremos exactos de la data a los inputs del DOM
+            const fechaMinima = fechasValidas[0];
+            const fechaMaxima = fechasValidas[fechasValidas.length - 1];
+            
+            document.getElementById('filter-fecha-inicio').value = fechaMinima;
+            document.getElementById('filter-fecha-fin').value = fechaMaxima;
+            
+            print(`Límites de Jornada Establecidos -> Mínimo: ${fechaMinima} | Máximo: ${fechaMaxima}`);
         }
 
         function aplicarFiltroFecha() { filtrarYCalcular(); }
