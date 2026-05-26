@@ -11,6 +11,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # LINEAS CRÍTICAS: Le damos permiso al bot para modificar y subir archivos al repositorio
+    permissions:
+      contents: write
+      
     steps:
     - name: Clonar el repositorio
       uses: actions/checkout@v3
@@ -33,4 +37,5 @@ jobs:
         git config --local user.email "actions@github.com"
         git config --local user.name "GitHub Actions"
         git add data/data_jornada.csv
+        # Evita fallar si no hay cambios reales en la data
         git diff --quiet && git diff --staged --quiet || (git commit -m "Autodespliegue: data_jornada.csv actualizado con data real del EESS" && git push)
