@@ -1,4 +1,4 @@
-    import pandas as pd
+import pandas as pd
 import os
 
 def procesar_informacion_his():
@@ -47,14 +47,13 @@ def procesar_informacion_his():
         return
 
     # ── NORMALIZACIÓN RADICAL DE CABECERAS ───────────────────────────────────
-    # Elimina caracteres invisibles de control, espacios y estandariza a MAYÚSCULAS
     df.columns = [
         str(col).encode('utf-8', 'ignore').decode('utf-8-sig').strip().upper() 
         for col in df.columns
     ]
     print("Columnas normalizadas en memoria:", list(df.columns))
 
-    # Mapeo flexible de nombres de columnas (Inmune a tildes o guiones bajos)
+    # Mapeo flexible de nombres de columnas
     col_item  = next((c for c in df.columns if 'ITEM' in c or 'COD' in c), None)
     col_corr  = next((c for c in df.columns if 'CORREL' in c or 'NUM_LAB' in c or 'ID_CORR' in c), None)
     col_fecha = next((c for c in df.columns if 'FECHA' in c or 'ATENC' in c or 'FEC' in c), None)
@@ -72,19 +71,15 @@ def procesar_informacion_his():
 
     print(f"Campos asignados -> Ítem: {col_item} | Correlativo: {col_corr} | Cita: {col_cita}")
 
-    # ── FILTROS ULTRA-PERMISIVOS (WHERE Codigo_Item = '99801' AND Id_Correlativo_Lab = 1) ──
-    # Limpiamos decimales flotantes invisibles que deja Excel (ej: 99801.0 -> 99801)
+    # ── FILTROS (WHERE Codigo_Item = '99801' AND Id_Correlativo_Lab = 1) ──
     serie_item = df[col_item].astype(str).str.strip().str.split('.').str[0]
     serie_corr = pd.to_numeric(df[col_corr], errors='coerce').fillna(0).astype(int)
 
     df_filtrado = df[(serie_item == '99801') & (serie_corr == 1)].copy()
-    print(f"Filas que pasaron el filtro estricto (Correlativo = 1): {len(df_filtrado)}")
-
-    # Fallback si el correlativo viene vacío o mapeado de otra forma
+    
     if df_filtrado.empty:
         print("Aviso: Cero filas encontradas con Correlativo=1. Intentando rescate basado solo en el código 99801...")
         df_filtrado = df[serie_item == '99801'].copy()
-        print(f"Filas rescatadas con filtro flexible: {len(df_filtrado)}")
 
     if df_filtrado.empty:
         print("AVISO: Ninguna fila cumple los filtros del código '99801'. Generando archivo de contingencia.")
@@ -97,24 +92,20 @@ def procesar_informacion_his():
     df_filtrado[col_fecha] = df_filtrado[col_fecha].astype(str).str.strip().str.split(' ').str[0]
     df_filtrado[col_vlab] = df_filtrado[col_vlab].astype(str).str.strip().upper()
 
-    # ── CONSOLIDACIÓN DE ETAPAS DE VIDA (GROUP BY & COUNT) ───────────────────
-    grupos = [col_fecha, col_vlab]
+    # ── CONSOLIDACIÓN DE ETAPAS DE VIDA OPTIMIZADA ───────────────────────────
+    # Vectorización directa para evitar errores de estructura con funciones lambda complejas
+    df_filtrado['NIÑO']         = df_filtrado[col_edad].between(0, 11).astype(int)
+    df_filtrado['ADOLESCENTE']  = df_filtrado[col_edad].between(12, 17).astype(int)
+    df_filtrado['JOVEN']        = df_filtrado[col_edad].between(18, 29).astype(int)
+    df_filtrado['ADULTO']       = df_filtrado[col_edad].between(30, 59).astype(int)
+    df_filtrado['ADULTO MAYOR'] = (df_filtrado[col_edad] > 59).astype(int)
 
-    df_consolidado = df_filtrado.groupby(grupos).apply(
-        lambda g: pd.Series({
-            'NIÑO':         g.loc[g[col_edad].between(0, 11),  col_cita].count(),
-            'ADOLESCENTE':  g.loc[g[col_edad].between(12, 17), col_cita].count(),
-            'JOVEN':        g.loc[g[col_edad].between(18, 29), col_cita].count(),
-            'ADULTO':       g.loc[g[col_edad].between(30, 59), col_cita].count(),
-            'ADULTO MAYOR': g.loc[g[col_edad] > 59,            col_cita].count(),
-        })
-    ).reset_index()
+    # Agrupamos sumando directamente las clasificaciones calculadas
+    df_consolidado = df_filtrado.groupby([col_fecha, col_vlab])[
+        ['NIÑO', 'ADOLESCENTE', 'JOVEN', 'ADULTO', 'ADULTO MAYOR']
+    ].sum().reset_index()
 
-    # Asegurar formato entero para los conteos
-    for col in ['NIÑO', 'ADOLESCENTE', 'JOVEN', 'ADULTO', 'ADULTO MAYOR']:
-        df_consolidado[col] = df_consolidado[col].astype(int)
-
-    # Renombrar columnas finales para que coincidan con la estructura que consume el index.html
+    # Renombrar columnas finales para asegurar compatibilidad con la web
     df_consolidado.rename(columns={
         col_fecha: 'Fecha_Atencion',
         col_vlab: 'Valor_Lab'
