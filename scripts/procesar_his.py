@@ -19,7 +19,6 @@ def procesar_informacion_his():
 
     print(f"Procesando archivo detectado desde: {ruta_origen}")
 
-    # Forzar la lectura con separador por coma basado en lo visto en el log
     df = None
     try:
         df = pd.read_csv(ruta_origen, sep=',', encoding='utf-8-sig', on_bad_lines='skip')
@@ -51,22 +50,29 @@ def procesar_informacion_his():
     if not col_vlab: col_vlab = next((c for c in df.columns if 'VALOR' in c or 'LAB' in c), df.columns[24] if len(df.columns) > 24 else df.columns[0])
     if not col_edad: col_edad = next((c for c in df.columns if 'ANIO_ACTUAL' in c or 'EDAD' in c), df.columns[18] if len(df.columns) > 18 else df.columns[0])
 
-    print(f"Mapeo indexado -> Item: {col_item} | Fecha: {col_fecha} | Valor Lab: {col_vlab} | Edad: {col_edad}")
+    print(f"Mapeo indexado -> Item: {col_item} | Correlativo: {col_corr} | Fecha: {col_fecha} | Valor Lab: {col_vlab} | Edad: {col_edad}")
 
-    # Convertir a string y limpiar espacios
+    # Convertir a string y limpiar espacios para evitar falsos negativos por formato
     df[col_item] = df[col_item].astype(str).str.strip()
+    df[col_corr] = df[col_corr].astype(str).str.strip()
 
-    # Filtro de búsqueda parcial (Captura el código limpio)
-    df_filtrado = df[df[col_item].str.contains('99801', na=False)].copy()
-    print(f"Filas encontradas que contienen '99801': {len(df_filtrado)}")
+    # =========================================================================
+    # MODIFICACIÓN: FILTRADO SIMULTÁNEO (codigo_item contiene '99801' Y id_correlativo_lab es '1')
+    # =========================================================================
+    condicion_item = df[col_item].str.contains('99801', na=False)
+    condicion_corr = (df[col_corr] == '1') | (df[col_corr] == '1.0') # Soporta variaciones de floats de Pandas
+    
+    df_filtrado = df[condicion_item & condicion_corr].copy()
+    print(f"Filas encontradas que cumplen ambas condiciones simultáneamente: {len(df_filtrado)}")
+    # =========================================================================
 
     if df_filtrado.empty:
-        print("AVISO: Ninguna fila coincide con el código '99801'. Generando archivo de contingencia.")
+        print("AVISO: Ninguna fila coincide con los criterios solicitados. Generando archivo de contingencia.")
         df_vacio = pd.DataFrame(columns=['Fecha_Atencion', 'Valor_Lab', 'NIÑO', 'ADOLESCENTE', 'JOVEN', 'ADULTO', 'ADULTO MAYOR'])
         df_vacio.to_csv(ruta_destino, sep=',', index=False, encoding='utf-8')
         return
 
-    # Limpieza de tipos de datos sobre el DataFrame filtrado (CORRECCIÓN .str.upper())
+    # Limpieza de tipos de datos sobre el DataFrame filtrado
     df_filtrado[col_edad] = pd.to_numeric(df_filtrado[col_edad], errors='coerce').fillna(-1).astype(int)
     df_filtrado[col_fecha] = df_filtrado[col_fecha].astype(str).str.strip().str.split(' ').str[0]
     df_filtrado[col_vlab] = df_filtrado[col_vlab].astype(str).str.strip().str.upper()
